@@ -1,0 +1,15 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sed
+    password: root
+    username: admin
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/sed
+    password: root
+    user: admin
+    default-schema: public
+    liquibase-schema: public
+    change-log: classpath*:db.changelog/db.changelog-master.xml
