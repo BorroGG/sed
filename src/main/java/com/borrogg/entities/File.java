@@ -31,10 +31,10 @@ public class File {
     @Column(name = "size_kb")
     private Integer sizeKB;
 
-    @Column(name = "path_in_system")
-    private String pathInSystem;
+    @Column(name = "file_code")
+    private String fileCode;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 

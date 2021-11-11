@@ -13,3 +13,7 @@ spring:
     default-schema: public
     liquibase-schema: public
     change-log: classpath*:db.changelog/db.changelog-master.xml
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true

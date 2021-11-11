@@ -45,7 +45,7 @@ http://www.liquibase.org/xml/ns/pro ">
             <column name = "format" type="VARCHAR"/>
             <column name = "date_download" type="DATE"/>
             <column name = "size_kb" type="INT"/>
-            <column name = "path_in_system" type="VARCHAR"/>
+            <column name = "file_code" type="VARCHAR"/>
             <column name = "client_id" type="INT">
                 <constraints nullable="false" foreignKeyName="fk_client_id" references="client(client_id)"/>
             </column>
@@ -65,14 +65,14 @@ http://www.liquibase.org/xml/ns/pro ">
         <insert tableName="client">
             <column name = "fio" value="Ермаков Василий Петрович"/>
             <column name = "date_of_birth" value="20-08-1980"/>
-            <column name = "department_id" value="3"/>
+            <column name = "department_id" value="5"/>
             <column name = "position" value="1"/>
             <column name = "phone" value="89160985733"/>
         </insert>
         <insert tableName="client">
             <column name = "fio" value="Злобин Кирилл Романов"/>
             <column name = "date_of_birth" value="17-07-1970"/>
-            <column name = "department_id" value="4"/>
+            <column name = "department_id" value="6"/>
             <column name = "position" value="1"/>
             <column name = "phone" value="89175023494"/>
         </insert>
