@@ -31,9 +31,6 @@ public class File {
     @Column(name = "size_kb")
     private Integer sizeKB;
 
-    @Column(name = "file_code")
-    private String fileCode;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;

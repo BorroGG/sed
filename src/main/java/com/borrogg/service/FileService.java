@@ -38,6 +38,10 @@ public class FileService {
         return fileRepository.findAll();
     }
 
+    public boolean isLastFileInStorage(String fileName) {
+        return fileRepository.countFileByName(fileName) == 1;
+    }
+
     public void deleteFile(File file) {
         fileRepository.delete(file);
     }

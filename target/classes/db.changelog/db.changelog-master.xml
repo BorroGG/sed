@@ -77,5 +77,10 @@ http://www.liquibase.org/xml/ns/pro ">
             <column name = "phone" value="89175023494"/>
         </insert>
     </changeSet>
+    <changeSet id="remove file_code column" author="admin">
+        <dropColumn tableName="file">
+            <column name="file_code"/>
+        </dropColumn>
+    </changeSet>
 
 </databaseChangeLog>

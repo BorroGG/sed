@@ -9,4 +9,5 @@ import java.util.List;
 public interface FileRepository extends JpaRepository<File, Integer> {
     List<File> findAllByClient(Client client);
     List<File> findAllByFormatAndSizeKBBetween(String format, Integer from, Integer to);
+    Integer countFileByName(String fileName);
 }

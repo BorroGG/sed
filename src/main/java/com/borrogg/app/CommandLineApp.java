@@ -7,8 +7,8 @@ import com.borrogg.service.DepartmentService;
 import com.borrogg.service.ClientService;
 import com.borrogg.service.FileService;
 import com.borrogg.util.SearchEntity;
+import com.borrogg.util.ZipDirectory;
 import dnl.utils.text.table.TextTable;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.swing.table.TableModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,12 +92,24 @@ public class CommandLineApp implements CommandLineRunner {
             } else if (inputDecimal == 14) {
                 createReport();
             } else if (inputDecimal == 15) {
+                zipAllFiles(in);
+            } else if (inputDecimal == 16) {
                 in.close();
                 break;
             } else {
                 System.out.println(INCORRECT_INPUT);
             }
         }
+    }
+
+    private void zipAllFiles(Scanner in) {
+        System.out.println("Введите путь для выгрузки(например D:\\sedForSave): ");
+        String path = in.nextLine();
+
+        ZipDirectory zipDir = new ZipDirectory();
+        File inputDir = new File(PATH_TO_FILES);
+        File outputZipFile = new File(path + "\\files.zip");
+        zipDir.zipDirectory(inputDir, outputZipFile);
     }
 
     private void createReport() {
@@ -182,11 +194,13 @@ public class CommandLineApp implements CommandLineRunner {
         }
         int numFile = getNum(in);
 
-        File file = new File(fileService.getFileById(files.get(numFile).getFileId()).getFileCode());
-        try {
-            Files.delete(file.toPath());
-        } catch (IOException e) {
-            System.out.println(ERROR_ON_DELETE_FILE);
+        File file = new File(PATH_TO_FILES + "\\" +  fileService.getFileById(files.get(numFile).getFileId()).getName());
+        if (fileService.isLastFileInStorage(file.getName())) {
+            try {
+                Files.delete(file.toPath());
+            } catch (IOException e) {
+                System.out.println(ERROR_ON_DELETE_FILE);
+            }
         }
 
         fileService.deleteFile(files.get(numFile));
@@ -198,7 +212,7 @@ public class CommandLineApp implements CommandLineRunner {
         System.out.println(INPUT_PATH_TO_DOWNLOAD);
         String pathToSave = in.nextLine();
         for (com.borrogg.entities.File value : files) {
-            File file = new File(fileService.getFileById(value.getFileId()).getFileCode());
+            File file = new File(PATH_TO_FILES + "\\" + fileService.getFileById(value.getFileId()).getName());
             if (saveFileInSystem(file, pathToSave + "\\" + value.getName()))
                 return;
         }
@@ -222,7 +236,7 @@ public class CommandLineApp implements CommandLineRunner {
         System.out.println(INPUT_PATH_TO_DOWNLOAD);
         String pathToSave = in.nextLine();
 
-        File file = new File(fileService.getFileById(files.get(numFile).getFileId()).getFileCode());
+        File file = new File(PATH_TO_FILES + "\\" + fileService.getFileById(files.get(numFile).getFileId()).getName());
 
         if (saveFileInSystem(file, pathToSave + "\\" + files.get(numFile).getName()))
             return;
@@ -248,16 +262,13 @@ public class CommandLineApp implements CommandLineRunner {
             if (file.exists() && file.isFile() && file.length() < 10_000_000) {
                 if (fileService.getFilesByClientId(selectedClient).size() < 20) {
 
-                    String fileCode = RandomString.make(10);
-
-                    if (saveFileInSystem(file, fileCode)) return;
+                    if (saveFileInSystem(file, PATH_TO_FILES + "\\" + fileName)) return;
 
                     com.borrogg.entities.File fileToSave = new com.borrogg.entities.File();
                     fileToSave.setName(fileName);
                     fileToSave.setFormat(fileName.substring(fileName.lastIndexOf(".")));
                     fileToSave.setDateDownload(LocalDate.now());
                     fileToSave.setSizeKB((int) (file.length() / 1000));
-                    fileToSave.setFileCode(fileCode);
                     fileToSave.setClient(selectedClient);
                     fileService.addFile(fileToSave);
                     System.out.println(CREATE_FILE_COMPLETE);
@@ -284,12 +295,19 @@ public class CommandLineApp implements CommandLineRunner {
 
         Path path1 = Paths.get(fileCode);
         Path file2;
-        try {
-            file2 = Files.createFile(path1);
-        } catch (IOException e) {
-            System.out.println(ERROR_ON_CREATE_FILE);
-            return true;
-        }
+        int i = 1;
+//        while(true) {
+            try {
+                file2 = Files.createFile(path1);
+//                break;
+            } catch (FileAlreadyExistsException e) {
+                return false;
+            }
+            catch (IOException e) {
+                System.out.println(ERROR_ON_CREATE_FILE);
+                return true;
+            }
+//        }
         try (FileOutputStream stream = new FileOutputStream(file2.toString())) {
             stream.write(fileByte);
         } catch (IOException e) {
@@ -378,7 +396,7 @@ public class CommandLineApp implements CommandLineRunner {
                 System.out.printf((FILE_INFO) + "%n", file.getFileId(),
                         file.getName(), file.getFormat(),
                         file.getDateDownload().toString(), file.getSizeKB().toString(),
-                        file.getFileCode(), file.getClient().getFIO());
+                        file.getClient().getFIO());
             }
         } else {
             System.out.println(NOTHING_FOUND);
@@ -431,7 +449,7 @@ public class CommandLineApp implements CommandLineRunner {
     private void getAllPositions() {
         System.out.println(INFO_ABOUT_ALL_POSITIONS);
         for (Position position : Position.values()) {
-            System.out.println(position);
+            System.out.println(position.name() + " - " + position.getValue());
         }
     }
 
@@ -443,7 +461,7 @@ public class CommandLineApp implements CommandLineRunner {
             System.out.printf((CLIENT_INFO) + "%n", client.getClientId(),
                     client.getFIO(), client.getDateOfBirth(),
                     client.getDepartment().getName(), client.getPosition(),
-                    client.getPhone(), filesNames);
+                    client.getPhone(), filesNames + "\n");
         }
     }
 
@@ -477,10 +495,13 @@ public class CommandLineApp implements CommandLineRunner {
     private String getFilesNames(Client selectedClient) {
         StringBuilder filesNames = new StringBuilder();
         List<com.borrogg.entities.File> files = selectedClient.getFiles();
-        for (com.borrogg.entities.File file : files) {
-            filesNames.append(file.getName()).append("\n");
+        if (files.size() != 0) {
+            for (int i = 0; i < files.size(); i++) {
+                filesNames.append(i + 1).append(". ").append(files.get(i).getName()).append("\n");
+            }
+            return filesNames.toString();
         }
-        return filesNames.toString();
+        return "Файлов нет!";
     }
 
     private Client createClientFromConsole(Scanner in) {

@@ -19,7 +19,8 @@ public class ProgramUtil {
             "12. Выгрузить все файлы. \n" +
             "13. Найти файл. \n" +
             "14. Отчет по варианту. \n" +
-            "15. Выйти. \n";
+            "15. Выгрузка всех файлов в виде сжатого архива. \n" +
+            "16. Выйти. \n";
     public static final String UNIQUE_QUERY = "SELECT d.name as \"Отдел\", SUM(f.size_kb) " +
             "as \"Размер всех файлов сотрудников\", AVG(Count) as \"Среднее количество файлов сотрудников\"\n" +
             "FROM (\n" +
@@ -32,6 +33,7 @@ public class ProgramUtil {
             "JOIN file f on c.client_id = f.client_id\n" +
             "GROUP BY d.name";
     public static final String INCORRECT_INPUT = "Неверный ввод, попробуйте еще раз.";
+    public static final String PATH_TO_FILES = "C:\\Users\\Евгений\\IdeaProjects\\SED\\files";
     public static final String ADD_NEW_USER_SUCCESS = "Новый пользователь успешно добавлен!";
     public static final String INPUT_FIO = "Введите ФИО пользователя: ";
     public static final String INPUT_DATE_OF_BIRTH = "Введите дату рождения в формате dd-MM-yyyy(Например 08-06-2000): ";
@@ -88,12 +90,10 @@ public class ProgramUtil {
             "Формат = %s \n" +
             "Дата загрузки = %s \n" +
             "Размер в кб = %s \n" +
-            "Уникальный код = %s \n" +
             "Принадлежит: %s \n";
     public static final String SELECT_FORMAT_FOR_SEARCH = "Выберете формат изображения для поиска: \n" +
             "1. .png \n" +
             "2. .jpeg \n" +
             "3. .bmp \n" +
             "4. .gif \n";
-
 }
