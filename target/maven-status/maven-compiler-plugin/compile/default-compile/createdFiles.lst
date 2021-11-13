@@ -1,8 +1,0 @@
-com\borrogg\entities\User.class
-com\borrogg\repositories\UserRepository.class
-com\borrogg\entities\File.class
-com\borrogg\enums\Position.class
-com\borrogg\repositories\DepartmentRepository.class
-com\borrogg\SEDApplication.class
-com\borrogg\repositories\FileRepository.class
-com\borrogg\entities\Department.class
