@@ -83,4 +83,8 @@ http://www.liquibase.org/xml/ns/pro ">
         </dropColumn>
     </changeSet>
 
+    <changeSet id="function_rad2deg" author="admin">
+        <sqlFile encoding="utf8" path="function.sql" relativeToChangelogFile="true"  splitStatements="false" stripComments="false"/>
+    </changeSet>
+
 </databaseChangeLog>

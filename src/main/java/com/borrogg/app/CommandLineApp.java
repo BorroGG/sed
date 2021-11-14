@@ -2,6 +2,7 @@ package com.borrogg.app;
 
 import com.borrogg.entities.Client;
 import com.borrogg.entities.Department;
+import com.borrogg.enums.Format;
 import com.borrogg.enums.Position;
 import com.borrogg.service.DepartmentService;
 import com.borrogg.service.ClientService;
@@ -88,12 +89,12 @@ public class CommandLineApp implements CommandLineRunner {
             } else if (inputDecimal == 12) {
                 downloadAllFiles(in);
             } else if (inputDecimal == 13) {
-                findFilesByFormatAndSize(in);
+                findFilesByName(in);
             } else if (inputDecimal == 14) {
-                createReport();
+                createReport(in);
+//            } else if (inputDecimal == 15) {
+//                zipAllFiles(in);
             } else if (inputDecimal == 15) {
-                zipAllFiles(in);
-            } else if (inputDecimal == 16) {
                 in.close();
                 break;
             } else {
@@ -112,59 +113,68 @@ public class CommandLineApp implements CommandLineRunner {
         zipDir.zipDirectory(inputDir, outputZipFile);
     }
 
-    private void createReport() {
-        List<SearchEntity> searchEntities = getSearchEntities();
-        Object[][] data = new Object[searchEntities.size()][5];
+    private void createReport(Scanner in) {
+        System.out.println(SELECT_FORMAT_FOR_SEARCH);
+        System.out.println("Введите все подходящие номера(например 13): ");
+        String formats = in.nextLine();
+        List<Integer> formatsInt = new ArrayList<>();
+        for (int i = 0; i < formats.length(); i++) {
+            try {
+                formatsInt.add(Integer.parseInt(formats.substring(i, i + 1)));
+            } catch (NumberFormatException e) {
+                System.out.println(INCORRECT_INPUT);
+            }
+        }
+        List<SearchEntity> searchEntities = getSearchEntities(formatsInt);
+        Object[][] data = new Object[searchEntities.size()][4];
         for (int i = 0; i < searchEntities.size(); i++) {
             data[i][0] = i;
-            data[i][1] = searchEntities.get(i).getName();
-            data[i][2] = searchEntities.get(i).getSizeKb();
-            data[i][3] = searchEntities.get(i).getDateCreate();
-            data[i][4] = searchEntities.get(i).getFioOwner();
+            data[i][1] = searchEntities.get(i).getId();
+            data[i][2] = searchEntities.get(i).getFio();
+            data[i][3] = searchEntities.get(i).getFormat();
         }
-        TextTable tt = new TextTable(new String[]{"Номер", "Название файла", "Размер", "Дата создания", "Кому принадлежит"}, data);
+        TextTable tt = new TextTable(new String[]{"Номер", "Id пользователя", "ФИО пользователя", "Подходящий формат"}, data);
         tt.printTable();
     }
 
-    private List<SearchEntity> getSearchEntities() {
-        try {
-            Query query = entityManager.createNativeQuery(UNIQUE_QUERY);
-            List<Object[]> list = (List<Object[]>) query.getResultList();
-            List<SearchEntity> searchEntities = new ArrayList<>();
-            for (Object[] objects : list) {
-                searchEntities.add(new SearchEntity(objects));
+    private List<SearchEntity> getSearchEntities(List<Integer> formatsInt) {
+        List<SearchEntity> searchEntities = new ArrayList<>();
+        for (Integer integer : formatsInt) {
+            try {
+                Query query = entityManager.createNativeQuery(UNIQUE_QUERY);
+                query.setParameter("format", getFormat(integer));
+                List<Object[]> list = (List<Object[]>) query.getResultList();
+                for (Object[] objects : list) {
+                    searchEntities.add(new SearchEntity(objects));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
             }
-            return searchEntities;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
         }
+        return searchEntities;
     }
 
-    private void findFilesByFormatAndSize(Scanner in) {
-        System.out.println(SELECT_FORMAT_FOR_SEARCH);
-        int formatId = getNum(in) + 1;
-        if (formatId > 0 && formatId < 5) {
-            String format = getFormatById(formatId);
-            int from;
-            int to;
-            while (true) {
-                try {
-                    System.out.println(INPUT_RANGE_SIZE_FILE);
-                    String query2 = in.nextLine();
-                    from = Integer.parseInt(query2.split("-")[0]);
-                    to = Integer.parseInt(query2.split("-")[1]);
-                    break;
-                } catch (Exception e) {
-                    System.out.println(INCORRECT_INPUT);
-                }
-            }
-            List<com.borrogg.entities.File> files = fileService.findAllByFormatAndSizeKBBetween(format, from, to);
-
-            lookAtResultFile(files);
-        } else {
-            System.out.println(INCORRECT_INPUT);
+    private Object getFormat(Integer integer) {
+        if (integer.equals(Format.TXT.getNum())) {
+            return Format.TXT.getFormat();
+        } else if(integer.equals(Format.DOC.getNum())) {
+            return Format.DOC.getFormat();
+        } else if(integer.equals(Format.DOCX.getNum())) {
+            return Format.DOCX.getFormat();
+        } else if(integer.equals(Format.PDF.getNum())) {
+            return Format.PDF.getFormat();
         }
+        return null;
+    }
+
+    private void findFilesByName(Scanner in) {
+        System.out.println(INPUT_QUERY_FOR_SEARCH);
+
+        String query = in.nextLine();
+        List<com.borrogg.entities.File> files = fileService.findAllByNameContaining(query);
+
+        lookAtResultFile(files);
     }
 
     private String getFormatById(int formatId) {
@@ -195,7 +205,7 @@ public class CommandLineApp implements CommandLineRunner {
         }
         int numFile = getNum(in);
 
-        File file = new File(PATH_TO_FILES + "\\" +  fileService.getFileById(files.get(numFile).getFileId()).getName());
+        File file = new File(PATH_TO_FILES + "\\" + fileService.getFileById(files.get(numFile).getFileId()).getName());
         if (fileService.isLastFileInStorage(file.getName())) {
             try {
                 Files.delete(file.toPath());
@@ -255,14 +265,15 @@ public class CommandLineApp implements CommandLineRunner {
         Client selectedClient = clients.get(num);
         System.out.println(INPUT_FILENAME);
         String input = in.nextLine();
-        if (input.endsWith(".jpeg") || input.endsWith(".png") || input.endsWith(".bmp") || input.endsWith(".gif")) {
+        if (input.endsWith(".txt") || input.endsWith(".doc") || input.endsWith(".docx") || input.endsWith(".pdf")) {
             String path = input.substring(0, input.lastIndexOf("\\"));
             String fileName = input.substring(input.lastIndexOf("\\") + 1);
             File file = new File(path, fileName);
-            if (file.exists() && file.isFile() && file.length() < 10_000_000) {
-                if (fileService.getFilesByClientId(selectedClient).size() < 20) {
+            if (file.exists() && file.isFile() && file.length() < 5_000_000) {
+                if (fileService.getFilesByClientId(selectedClient).size() < 10) {
 
-                    if (saveFileInSystem(file, PATH_TO_FILES + "\\" + fileName)) return;
+                    if (saveFileInSystem(file, PATH_TO_FILES + "\\" + fileName))
+                        return;
 
                     com.borrogg.entities.File fileToSave = new com.borrogg.entities.File();
                     fileToSave.setName(fileName);
@@ -295,15 +306,14 @@ public class CommandLineApp implements CommandLineRunner {
 
         Path path1 = Paths.get(fileCode);
         Path file2;
-            try {
-                file2 = Files.createFile(path1);
-            } catch (FileAlreadyExistsException e) {
-                return false;
-            }
-            catch (IOException e) {
-                System.out.println(ERROR_ON_CREATE_FILE);
-                return true;
-            }
+        try {
+            file2 = Files.createFile(path1);
+        } catch (FileAlreadyExistsException e) {
+            return false;
+        } catch (IOException e) {
+            System.out.println(ERROR_ON_CREATE_FILE);
+            return true;
+        }
         try (FileOutputStream stream = new FileOutputStream(file2.toString())) {
             stream.write(fileByte);
         } catch (IOException e) {

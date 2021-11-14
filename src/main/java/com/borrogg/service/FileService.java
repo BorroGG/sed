@@ -30,6 +30,10 @@ public class FileService {
         return fileRepository.findById(id).get();
     }
 
+    public List<File> findAllByNameContaining(String name) {
+        return fileRepository.findAllByNameContaining(name);
+    }
+
     public List<File> findAllByFormatAndSizeKBBetween(String format, Integer from, Integer to) {
         return fileRepository.findAllByFormatAndSizeKBBetween(format, from, to);
     }

@@ -20,12 +20,9 @@ public class ProgramUtil {
             "12. Выгрузить все файлы. \n" +
             "13. Найти файл. \n" +
             "14. Отчет по варианту. \n" +
-            "15. Выгрузка всех файлов в виде сжатого архива. \n" +
-            "16. Выйти. \n";
-    public static final String UNIQUE_QUERY = "SELECT f.name AS \"Название\",\n" +
-            "       f.size_kb AS \"Размер\", f.date_download AS \"Дата создания\",\n" +
-            "       c.fio AS \"Владелец (ФИО)\" FROM file f\n" +
-            "       JOIN client c on c.client_id = f.client_id";
+//            "15. Выгрузка всех файлов в виде сжатого архива. \n" +
+            "15. Выйти. \n";
+    public static final String UNIQUE_QUERY = "SELECT * FROM file_format(:format)";
     public static final String INCORRECT_INPUT = "Неверный ввод, попробуйте еще раз.";
     public static final String ADD_NEW_USER_SUCCESS = "Новый пользователь успешно добавлен!";
     public static final String INPUT_FIO = "Введите ФИО пользователя: ";
@@ -85,8 +82,8 @@ public class ProgramUtil {
             "Размер в кб = %s \n" +
             "Принадлежит: %s \n";
     public static final String SELECT_FORMAT_FOR_SEARCH = "Выберете формат изображения для поиска: \n" +
-            "1. .png \n" +
-            "2. .jpeg \n" +
-            "3. .bmp \n" +
-            "4. .gif \n";
+            "1. .txt \n" +
+            "2. .doc \n" +
+            "3. .docx \n" +
+            "4. .pdf \n";
 }
