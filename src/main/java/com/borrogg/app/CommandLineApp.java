@@ -114,14 +114,15 @@ public class CommandLineApp implements CommandLineRunner {
 
     private void createReport() {
         List<SearchEntity> searchEntities = getSearchEntities();
-        Object[][] data = new Object[searchEntities.size()][4];
+        Object[][] data = new Object[searchEntities.size()][5];
         for (int i = 0; i < searchEntities.size(); i++) {
             data[i][0] = i;
-            data[i][1] = searchEntities.get(i).getDepartment();
-            data[i][2] = searchEntities.get(i).getSizeSum();
-            data[i][3] = searchEntities.get(i).getAvgCountFiles();
+            data[i][1] = searchEntities.get(i).getName();
+            data[i][2] = searchEntities.get(i).getSizeKb();
+            data[i][3] = searchEntities.get(i).getDateCreate();
+            data[i][4] = searchEntities.get(i).getFioOwner();
         }
-        TextTable tt = new TextTable(new String[]{"Номер", "Отдел", "Размер всех файлов", "Среднее количество файлов"}, data);
+        TextTable tt = new TextTable(new String[]{"Номер", "Название файла", "Размер", "Дата создания", "Кому принадлежит"}, data);
         tt.printTable();
     }
 
@@ -245,7 +246,6 @@ public class CommandLineApp implements CommandLineRunner {
     }
 
     private void addNewFile(Scanner in) {
-        // C:\Users\Евгений\Documents\The Witcher 3\gamesaves\AutoSave_53db9_7e404400_5d46d66.png
         System.out.println(SELECT_USER);
 
         List<Client> clients = getAndShowClients();
@@ -295,11 +295,8 @@ public class CommandLineApp implements CommandLineRunner {
 
         Path path1 = Paths.get(fileCode);
         Path file2;
-        int i = 1;
-//        while(true) {
             try {
                 file2 = Files.createFile(path1);
-//                break;
             } catch (FileAlreadyExistsException e) {
                 return false;
             }
@@ -307,7 +304,6 @@ public class CommandLineApp implements CommandLineRunner {
                 System.out.println(ERROR_ON_CREATE_FILE);
                 return true;
             }
-//        }
         try (FileOutputStream stream = new FileOutputStream(file2.toString())) {
             stream.write(fileByte);
         } catch (IOException e) {

@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ProgramUtil {
+    public static final String PATH_TO_FILES = "C:\\Users\\Евгений\\IdeaProjects\\SED\\files";
     public static final String MENU = "\n Что вы хотите сделать? Введите число из предложенных: \n" +
             "1. Вывести информацию о конкретном пользователе. \n" +
             "2. Вывести информацию обо всех пользователях. \n" +
@@ -21,19 +22,11 @@ public class ProgramUtil {
             "14. Отчет по варианту. \n" +
             "15. Выгрузка всех файлов в виде сжатого архива. \n" +
             "16. Выйти. \n";
-    public static final String UNIQUE_QUERY = "SELECT d.name as \"Отдел\", SUM(f.size_kb) " +
-            "as \"Размер всех файлов сотрудников\", AVG(Count) as \"Среднее количество файлов сотрудников\"\n" +
-            "FROM (\n" +
-            "SELECT COUNT(c.client_id) as Count, c.department_id FROM file\n" +
-            "JOIN client c on file.client_id = c.client_id\n" +
-            "JOIN department d on d.department_id = c.department_id\n" +
-            "group by c.department_id, c.client_id) as avg\n" +
-            "JOIN department d on avg.department_id = d.department_id\n" +
-            "JOIN client c on d.department_id = c.department_id\n" +
-            "JOIN file f on c.client_id = f.client_id\n" +
-            "GROUP BY d.name";
+    public static final String UNIQUE_QUERY = "SELECT f.name AS \"Название\",\n" +
+            "       f.size_kb AS \"Размер\", f.date_download AS \"Дата создания\",\n" +
+            "       c.fio AS \"Владелец (ФИО)\" FROM file f\n" +
+            "       JOIN client c on c.client_id = f.client_id";
     public static final String INCORRECT_INPUT = "Неверный ввод, попробуйте еще раз.";
-    public static final String PATH_TO_FILES = "C:\\Users\\Евгений\\IdeaProjects\\SED\\files";
     public static final String ADD_NEW_USER_SUCCESS = "Новый пользователь успешно добавлен!";
     public static final String INPUT_FIO = "Введите ФИО пользователя: ";
     public static final String INPUT_DATE_OF_BIRTH = "Введите дату рождения в формате dd-MM-yyyy(Например 08-06-2000): ";

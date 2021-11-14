@@ -3,19 +3,20 @@ package com.borrogg.util;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.util.Date;
 
 @Getter
 @Setter
 public class SearchEntity {
-    private String department;
-    private int sizeSum;
-    private int avgCountFiles;
+    private String name;
+    private int sizeKb;
+    private Date dateCreate;
+    private String fioOwner;
 
     public SearchEntity(Object[] columns) {
-        this.department = (String) columns[0];
-        this.sizeSum = (columns[1] != null)?((BigInteger)columns[1]).intValue():0;
-        this.avgCountFiles = (columns[2] != null)?((BigDecimal)columns[2]).intValue():0;
+        this.name = (String) columns[0];
+        this.sizeKb = (columns[1] != null)? (Integer) columns[1]:0;
+        this.dateCreate = (columns[2] != null)?((Date)columns[2]): null;
+        this.fioOwner = (String) columns[3];
     }
 }
