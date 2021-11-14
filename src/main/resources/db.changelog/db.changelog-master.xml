@@ -65,14 +65,14 @@ http://www.liquibase.org/xml/ns/pro ">
         <insert tableName="client">
             <column name = "fio" value="Ермаков Василий Петрович"/>
             <column name = "date_of_birth" value="20-08-1980"/>
-            <column name = "department_id" value="5"/>
+            <column name = "department_id" value="2"/>
             <column name = "position" value="1"/>
             <column name = "phone" value="89160985733"/>
         </insert>
         <insert tableName="client">
             <column name = "fio" value="Злобин Кирилл Романов"/>
             <column name = "date_of_birth" value="17-07-1970"/>
-            <column name = "department_id" value="6"/>
+            <column name = "department_id" value="1"/>
             <column name = "position" value="1"/>
             <column name = "phone" value="89175023494"/>
         </insert>
