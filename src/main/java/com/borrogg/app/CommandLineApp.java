@@ -9,8 +9,10 @@ import com.borrogg.service.FileService;
 import com.borrogg.util.SearchEntity;
 import com.borrogg.util.ZipDirectory;
 import dnl.utils.text.table.TextTable;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.format.datetime.standard.DateTimeFormatterFactory;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -28,14 +30,20 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import static com.borrogg.util.ProgramUtil.*;
 
 @Component
 public class CommandLineApp implements CommandLineRunner {
+
+    private Client currentUser;
+    private long sessionStart;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -54,6 +62,17 @@ public class CommandLineApp implements CommandLineRunner {
     @Override
     public void run(String... args) {
         Scanner in = new Scanner(System.in);
+
+        while (true) {
+            System.out.println(INPUT_LOGIN);
+            String login = in.nextLine();
+            System.out.println(INPUT_PASS);
+            String pass = in.nextLine();
+            if (enterAuth(login, pass)) {
+                break;
+            }
+        }
+
         while (true) {
             System.out.println(MENU);
             int inputDecimal = 0;
@@ -100,6 +119,21 @@ public class CommandLineApp implements CommandLineRunner {
                 System.out.println(INCORRECT_INPUT);
             }
         }
+    }
+
+    private boolean enterAuth(String login, String pass) {
+        currentUser = clientService.getClientByLogin(login);
+        if (!(Objects.nonNull(currentUser) && BCrypt.checkpw(pass, currentUser.getPass()))) {
+            currentUser = null;
+            System.out.println(INCORRECT_INPUT_LOGIN_OR_PASS);
+            return false;
+        }
+        sessionStart = System.currentTimeMillis();
+        return true;
+    }
+
+    private boolean isSessionEnd() {
+        return System.currentTimeMillis() > sessionStart + 60_000;
     }
 
     private void zipAllFiles(Scanner in) {

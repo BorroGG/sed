@@ -40,4 +40,10 @@ public class Client {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "client")
     private List<File> files;
+
+    @Column(name = "login")
+    private String login;
+
+    @Column(name = "pass")
+    private String pass;
 }

@@ -33,6 +33,9 @@ public class ProgramUtil {
             "JOIN file f on c.client_id = f.client_id\n" +
             "GROUP BY d.name";
     public static final String INCORRECT_INPUT = "Неверный ввод, попробуйте еще раз.";
+    public static final String INPUT_LOGIN = "Введите логин для входа:";
+    public static final String INPUT_PASS = "Введите пароль для входа:";
+    public static final String INCORRECT_INPUT_LOGIN_OR_PASS = "Неверный логин или пароль!";
     public static final String PATH_TO_FILES = "C:\\Users\\Евгений\\IdeaProjects\\SED\\files";
     public static final String ADD_NEW_USER_SUCCESS = "Новый пользователь успешно добавлен!";
     public static final String INPUT_FIO = "Введите ФИО пользователя: ";

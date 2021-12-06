@@ -35,6 +35,10 @@ public class ClientService {
         return clientRepository.findById(id).get();
     }
 
+    public Client getClientByLogin(String login) {
+        return clientRepository.findByLogin(login);
+    }
+
     public List<Client> getAll() {
         return clientRepository.findAll();
     }

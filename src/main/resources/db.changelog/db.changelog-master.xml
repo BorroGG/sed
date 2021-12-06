@@ -77,10 +77,33 @@ http://www.liquibase.org/xml/ns/pro ">
             <column name = "phone" value="89175023494"/>
         </insert>
     </changeSet>
+
     <changeSet id="remove file_code column" author="admin">
         <dropColumn tableName="file">
             <column name="file_code"/>
         </dropColumn>
+    </changeSet>
+
+    <changeSet id="creating document table" author="admin">
+        <createTable tableName="document">
+            <column name = "doc_id" type = "INT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="file_pk"/>
+            </column>
+            <column name = "text" type="VARCHAR"/>
+            <column name = "header" type="VARCHAR"/>
+            <column name = "date_create" type="DATE"/>
+            <column name = "date_modification" type="DATE"/>
+            <column name = "client_id" type="INT">
+                <constraints nullable="false" foreignKeyName="fk_client_id" references="client(client_id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add login and pass columns" author="admin">
+        <addColumn tableName="client">
+            <column name="login" type="VARCHAR"/>
+            <column name="pass" type="VARCHAR"/>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>
