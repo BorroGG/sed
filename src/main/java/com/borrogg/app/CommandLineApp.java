@@ -82,6 +82,7 @@ public class CommandLineApp implements CommandLineRunner {
                 System.out.println(INCORRECT_INPUT);
             }
 
+            // Active Work...
             if (inputDecimal == 1) {
                 getClientInfo(in);
             } else if (inputDecimal == 2) {
